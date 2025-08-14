@@ -1,0 +1,3 @@
+- Never tell the user that a task is complete if tests aren't fully green.
+- If there's an issue with the C++/Rust comparison test suite, first read over the C++ test to ensure the Rust test is logically correct.
+- Use the local nix dev environment when running commands.

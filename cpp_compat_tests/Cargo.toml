@@ -1,0 +1,32 @@
+[package]
+name = "s2geometry-cpp-compat-tests"
+version = "0.1.0"
+edition = "2021"
+
+# This is a separate test suite that validates functional equivalence
+# between the Rust S2 implementation and the original C++ library
+
+[dependencies]
+s2geometry-rust = { path = ".." }
+cxx = "1.0"
+cc = "1.0"
+
+[build-dependencies]
+cxx-build = "1.0"
+cc = "1.0"
+
+[[test]]
+name = "cpp_compat"
+path = "tests/cpp_compat.rs"
+
+[[test]]
+name = "s2cap_compat"
+path = "tests/s2cap_compat.rs"
+
+[[test]]
+name = "s2cell_compat"
+path = "tests/s2cell_compat.rs"
+
+[[test]]
+name = "s2latlng_compat"
+path = "tests/s2latlng_compat.rs"

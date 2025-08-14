@@ -1,0 +1,81 @@
+[package]
+name = "s2geometry-rust"
+version = "0.1.0"
+edition = "2021"
+authors = ["S2 Geometry Rust Port Contributors"]
+description = "Rust port of Google S2 Geometry Library"
+license = "Apache-2.0"
+repository = "https://github.com/user/s2geometry-rust"
+keywords = ["geometry", "spherical", "spatial", "gis", "geographic"]
+categories = ["mathematics", "data-structures", "algorithms"]
+
+[dependencies]
+# Core math library - using Bevy's battle-tested foundation  
+# Using "at least" version constraints for forward compatibility with Bevy updates
+glam = ">=0.29"
+bevy_math = { version = ">=0.15.0, <0.16.0", optional = true }  # Pin to 0.15.x for Rust 1.82 compatibility
+
+# Exact arithmetic for numerical robustness
+num-bigint = "0.4"
+num-rational = "0.4"
+num-traits = "0.2"
+
+# Error handling
+thiserror = "1.0"
+
+# Threading support (for Send + Sync bounds)
+once_cell = "1.19"
+
+# Serialization (for golden test data)
+serde = { version = "1.0", features = ["derive"], optional = true }
+bincode = { version = "1.3", optional = true }
+
+# WASM support for random number generation (used by dev dependencies)
+getrandom = { version = "0.2", features = ["js"], optional = true }
+
+# Benchmarking (not available on WASM)
+criterion = { version = "0.5", features = ["html_reports"], optional = true }
+
+# Note: proptest moved to dev-dependencies to avoid optional dependency issues
+
+[dev-dependencies]
+
+# Random number generation for testing
+rand = "0.8"
+rand_pcg = "0.3"
+rand_distr = "0.4"
+
+# Traditional unit testing
+rstest = "0.18"
+
+# Approximate floating-point comparison
+approx = "0.5"
+
+# Property-based testing for geometric invariants
+proptest = "1.4"
+
+[features]
+default = ["bevy-support", "bench-support"]
+serde_support = ["serde", "bincode"]
+# Feature for C++ reference comparison (requires external C++ build)
+cpp_reference_tests = []
+# Property-based testing support (now available via dev-dependencies)
+proptest-support = []
+# Bevy math support (disabled for WASM due to ahash/getrandom issues)
+bevy-support = ["bevy_math"]
+# Benchmarking support (disabled for WASM due to rayon issues)
+bench-support = ["criterion"]
+# WASM compatibility feature (excludes proptest, bevy_math, and criterion)
+wasm = ["getrandom/js"]
+
+[profile.release]
+# Optimize for mathematical computations
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[package.metadata.docs.rs]
+# Documentation features
+features = ["serde_support"]
+rustdoc-args = ["--html-in-header", "katex-header.html"]
