@@ -36,8 +36,9 @@ _deps/
 Thumbs.db
 
 # Rust-specific
-Cargo.lock  # Keep this for applications, remove for libraries
+# Cargo.lock - Keep for applications, uncomment to ignore for libraries
 target/
+**target/
 
 # OS-specific
 .DS_Store
