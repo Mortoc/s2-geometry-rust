@@ -1,0 +1,104 @@
+# Build outputs
+/target/
+build/
+target/
+
+# Compiled C++ artifacts
+*.o
+*.so
+*.so.*
+*.a
+*.dylib
+*.dll
+*.exe
+*.out
+a.out
+
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Rust-specific
+Cargo.lock  # Keep this for applications, remove for libraries
+target/
+
+# OS-specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.cache
+
+# C/C++ object files
+*.obj
+*.elf
+*.exe
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# CMake specific
+install_manifest.txt
+
+# Nix
+result
+result-*
+
+# Local development
+.env
+.env.local
+
+# Test outputs
+test-output/
+test-results/
+coverage/
+
+# Documentation builds
+docs/build/
+docs/_build/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Python cache (if any Python tools are used)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Rust documentation
+doc/
+
+# Binary executables
+bin/
