@@ -1,4 +1,4 @@
-#include "s2geometry-cpp-compat-tests/src/simple_lib.rs.h"
+#include "s2geometry-cpp-compat-tests/src/lib.rs.h"
 #include "simple_bridge.h"
 #include "s2/s2point.h"
 #include "s2/s2latlng.h"

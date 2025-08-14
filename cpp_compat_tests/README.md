@@ -1,15 +1,45 @@
 # S2 Geometry C++ Compatibility Test Suite
 
-This directory contains a comprehensive test suite that validates functional equivalence between the Rust S2 implementation and the original Google C++ S2 library. The tests ensure that both implementations produce identical results for the same inputs across all major S2 components.
+This directory contains a **conditionally enabled** test suite that validates functional equivalence between the Rust S2 implementation and the original Google C++ S2 library when available as a git submodule.
 
-## Overview
+## Conditional Testing System
+
+The C++ compatibility tests are **automatically enabled/disabled** based on submodule availability:
+
+- **✅ Submodule Available**: Full C++ compatibility tests run, comparing Rust and C++ implementations
+- **⚠️ Submodule Missing**: Tests are gracefully skipped with informative messages
+- **🔧 Build Failed**: Clear instructions provided for building the C++ library
+
+This design allows the main Rust library to be used independently without requiring C++ dependencies.
+
+## Quick Start
+
+### Option 1: Use Rust-Only (Default)
+No setup required! The library works independently and C++ tests are automatically skipped.
+
+### Option 2: Enable C++ Compatibility Tests
+
+```bash
+# 1. Initialize the submodule
+git submodule update --init --recursive
+
+# 2. Build the C++ library  
+cd s2geometry-cpp
+mkdir -p build && cd build
+cmake .. && make
+
+# 3. Run tests
+cd ../../cpp_compat_tests
+cargo test
+```
+
+## Test Architecture
 
 The compatibility test suite:
-- Embeds the C++ S2 library through FFI bindings
-- Compares Rust and C++ implementations for identical functionality
-- Tests major S2 components: S2Point, S2LatLng, S2CellId, S2Cell, S2Cap
-- Validates mathematical precision and algorithmic correctness
-- Ensures both implementations handle edge cases identically
+- **Runtime Detection**: Automatically detects if C++ submodule is available
+- **Conditional Compilation**: FFI bridge only compiled when C++ library is present
+- **Graceful Fallback**: Clear messaging when tests are skipped
+- **Status Reporting**: Shows exactly which tests are running/skipped
 
 ## Test Files
 

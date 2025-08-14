@@ -1,14 +1,14 @@
 //! General S2Point C++ Compatibility Tests
 //!
 //! Tests that verify functional equivalence between Rust and C++ S2Point implementations.
+//! These tests are conditionally enabled based on s2geometry-cpp submodule availability.
 
 use s2geometry_rust::{S2Point, math::DVec3};
 use s2geometry_cpp_compat_tests::*;
 
 const TOLERANCE: f64 = 1e-15;
 
-#[test]
-fn test_s2point_normalize_equivalence() {
+cpp_test!(test_s2point_normalize_equivalence, {
     // Test that point normalization produces identical results
     let test_vectors = vec![
         DVec3::new(1.0, 0.0, 0.0),
@@ -52,10 +52,9 @@ fn test_s2point_normalize_equivalence() {
         assert!(angles_equal_approx(cpp_norm, 1.0, TOLERANCE),
             "C++ normalized point {} is not unit length: {}", vec_idx, cpp_norm);
     }
-}
+});
 
-#[test]
-fn test_s2point_angle_equivalence() {
+cpp_test!(test_s2point_angle_equivalence, {
     // Test that angle calculations between points match
     let test_points = vec![
         DVec3::new(1.0, 0.0, 0.0),
@@ -82,14 +81,14 @@ fn test_s2point_angle_equivalence() {
             let rust_angle = point_a.angle(&point_b).radians();
             
             // Test C++ implementation
-            let cpp_angle = cpp_s2point_angle(point_a.into(), point_b.into());
+            let cpp_angle = simple_s2point_angle(point_a.into(), point_b.into());
             
             assert!(angles_equal_approx(rust_angle, cpp_angle, TOLERANCE),
                 "Angle mismatch between points {} and {}: Rust={}, C++={}, diff={}", 
                 i, j, rust_angle, cpp_angle, (rust_angle - cpp_angle).abs());
         }
     }
-}
+});
 
 #[test]
 fn test_s2point_cross_prod_equivalence() {

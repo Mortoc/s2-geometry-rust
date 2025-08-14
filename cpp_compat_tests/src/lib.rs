@@ -1,9 +1,15 @@
 //! Simple C++ Compatibility Test Bridge
 //!
 //! This is a simplified version focusing on basic S2 operations without complex vector returns
+//! Tests are conditionally enabled based on s2geometry-cpp submodule availability
 
 use std::fmt;
 
+pub mod submodule_helper;
+pub use submodule_helper::*;
+
+// Only compile C++ FFI bridge if cpp-compat feature is enabled
+#[cfg(feature = "cpp-compat")]
 #[cxx::bridge]
 mod ffi {
     // Simple shared types
@@ -48,9 +54,11 @@ mod ffi {
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 pub use ffi::*;
 
 // Helper functions to convert between Rust and C++ types
+#[cfg(feature = "cpp-compat")]
 impl From<s2geometry_rust::S2Point> for S2PointCpp {
     fn from(point: s2geometry_rust::S2Point) -> Self {
         let coords = point.coords();
@@ -62,6 +70,7 @@ impl From<s2geometry_rust::S2Point> for S2PointCpp {
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl From<S2PointCpp> for s2geometry_rust::S2Point {
     fn from(point: S2PointCpp) -> Self {
         s2geometry_rust::S2Point::from_normalized(
@@ -70,6 +79,7 @@ impl From<S2PointCpp> for s2geometry_rust::S2Point {
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl From<s2geometry_rust::S2LatLng> for S2LatLngCpp {
     fn from(latlng: s2geometry_rust::S2LatLng) -> Self {
         S2LatLngCpp {
@@ -79,12 +89,14 @@ impl From<s2geometry_rust::S2LatLng> for S2LatLngCpp {
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl From<S2LatLngCpp> for s2geometry_rust::S2LatLng {
     fn from(latlng: S2LatLngCpp) -> Self {
         s2geometry_rust::S2LatLng::from_radians(latlng.lat_radians, latlng.lng_radians)
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl From<s2geometry_rust::S2CellId> for S2CellIdCpp {
     fn from(cell_id: s2geometry_rust::S2CellId) -> Self {
         S2CellIdCpp {
@@ -93,24 +105,28 @@ impl From<s2geometry_rust::S2CellId> for S2CellIdCpp {
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl From<S2CellIdCpp> for s2geometry_rust::S2CellId {
     fn from(cell_id: S2CellIdCpp) -> Self {
         s2geometry_rust::S2CellId::new(cell_id.id)
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl fmt::Debug for S2PointCpp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "S2PointCpp({}, {}, {})", self.x, self.y, self.z)
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl fmt::Debug for S2LatLngCpp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "S2LatLngCpp({}, {})", self.lat_radians, self.lng_radians)
     }
 }
 
+#[cfg(feature = "cpp-compat")]
 impl fmt::Debug for S2CellIdCpp {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "S2CellIdCpp({})", self.id)
@@ -118,12 +134,14 @@ impl fmt::Debug for S2CellIdCpp {
 }
 
 // Comparison helpers with tolerance
+#[cfg(feature = "cpp-compat")]
 pub fn points_equal_approx(a: S2PointCpp, b: S2PointCpp, tolerance: f64) -> bool {
     (a.x - b.x).abs() < tolerance &&
     (a.y - b.y).abs() < tolerance &&
     (a.z - b.z).abs() < tolerance
 }
 
+#[cfg(feature = "cpp-compat")]
 pub fn angles_equal_approx(a: f64, b: f64, tolerance: f64) -> bool {
     (a - b).abs() < tolerance
 }

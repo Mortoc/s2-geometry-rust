@@ -1,0 +1,116 @@
+name: C++ Verification Tests
+
+on:
+  push:
+    branches: [ main, 'releases/*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  cpp-verification:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential libabsl-dev
+    
+    - name: Setup Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+        components: rustfmt, clippy
+    
+    - name: Cache Rust dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+    
+    - name: Cache C++ build
+      uses: actions/cache@v3
+      with:
+        path: s2geometry-cpp/build
+        key: ${{ runner.os }}-cpp-${{ hashFiles('s2geometry-cpp/**/*.h', 's2geometry-cpp/**/*.cc') }}
+        restore-keys: |
+          ${{ runner.os }}-cpp-
+    
+    - name: Build C++ S2 library
+      run: |
+        cd s2geometry-cpp
+        mkdir -p build
+        cd build
+        cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Release
+        make -j$(nproc)
+        ls -la libs2.so || echo "Warning: libs2.so not found, checking for alternative names..."
+        find . -name "*.so" -o -name "*.a" | head -10
+    
+    - name: Verify C++ library build
+      run: |
+        if [ ! -f "s2geometry-cpp/build/libs2.so" ]; then
+          echo "Expected library not found, checking available libraries..."
+          find s2geometry-cpp/build -name "*.so" -o -name "*.a" | head -10
+          # Try to find the actual library name
+          LIB_PATH=$(find s2geometry-cpp/build -name "*s2*" -type f | head -1)
+          if [ -n "$LIB_PATH" ]; then
+            echo "Found S2 library at: $LIB_PATH"
+            # Create a symlink if needed
+            ln -sf "$(basename $LIB_PATH)" s2geometry-cpp/build/libs2.so
+          else
+            echo "No S2 library found!"
+            exit 1
+          fi
+        fi
+    
+    - name: Build Rust library (without C++ tests)
+      run: |
+        cargo build --release
+        cargo test --release --lib
+    
+    - name: Build C++ compatibility tests
+      run: |
+        cd cpp_compat_tests
+        cargo build --release
+    
+    - name: Run C++ verification tests
+      run: |
+        cd cpp_compat_tests
+        cargo test --release -- --nocapture
+    
+    - name: Check code formatting
+      run: |
+        cargo fmt --all -- --check
+    
+    - name: Run Clippy lints
+      run: |
+        cargo clippy --all-targets --all-features -- -D warnings
+    
+    - name: Generate test report
+      if: always()
+      run: |
+        echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -f "cpp_compat_tests/target/release/deps/test-output.log" ]; then
+          echo "### C++ Compatibility Test Output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -50 cpp_compat_tests/target/release/deps/test-output.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Library Status" >> $GITHUB_STEP_SUMMARY
+        echo "- C++ S2 library: $(ls -la s2geometry-cpp/build/libs2.so 2>/dev/null && echo '✅ Built' || echo '❌ Missing')" >> $GITHUB_STEP_SUMMARY
+        echo "- Rust S2 library: ✅ Built" >> $GITHUB_STEP_SUMMARY
+        echo "- FFI Bridge: $([ -f cpp_compat_tests/target/release/libcpp_compat_tests.so ] && echo '✅ Compiled' || echo '❌ Failed')" >> $GITHUB_STEP_SUMMARY
