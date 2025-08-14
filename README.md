@@ -12,9 +12,9 @@ This project provides a Rust implementation of core S2 geometry functionality in
 - S2Cap: Spherical caps with precision-aware intersection testing
 - S2Cell & S2CellId: Hierarchical cell decomposition system
 
-## Test Coverage
+## Testing
 
-Currently achieving 93% test coverage for S2Cap implementation (13/14 tests passing) with systematic C++/Rust compatibility validation.
+The project includes comprehensive test suites with systematic C++/Rust compatibility validation to ensure mathematical equivalence with the original Google S2 implementation.
 
 ## Building
 
