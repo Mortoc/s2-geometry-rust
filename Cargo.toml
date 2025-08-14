@@ -1,11 +1,11 @@
 [package]
 name = "s2geometry-rust"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 authors = ["S2 Geometry Rust Port Contributors"]
 description = "Rust port of Google S2 Geometry Library"
 license = "Apache-2.0"
-repository = "https://github.com/user/s2geometry-rust"
+repository = "https://github.com/Mortoc/s2-geometry-rust"
 keywords = ["geometry", "spherical", "spatial", "gis", "geographic"]
 categories = ["mathematics", "data-structures", "algorithms"]
 
